@@ -1,0 +1,13 @@
+Back-End roles:
+
+	1. Scott - Data Engineer - Role #1 - Gather data, prepare proposal, prepare CSV files ready. Deliverable: CSV files to be imported in PG admin.
+
+	2. Said - Database Engineer - Role #2 -Create PG databases and develop Flask app. Deliverable: JSON objects to be used by JS.
+
+Front-End Roles:
+
+	3. Max - Web Developer - Role #3 - Create HTML page show and interact with visualizations. Deliverable: Webpage to host the JS visualizations
+
+	4. Trevor JS Developer - Role #4 - Create JS/Visualizations. Deliverable: 4 visualizations.
+
+	5. Scott - Documentation - Role #1 and #3 - Deliverable: PowerPoint presentation.
