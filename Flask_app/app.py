@@ -1,7 +1,7 @@
 import numpy as np
 import datetime as dt
 import pandas as pd
-import os
+
 
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
@@ -27,7 +27,7 @@ details = Base.classes.details
 regional = Base.classes.regional
 regions = Base.classes.regions
 
-labels =['Age 0-5', 'Age 6-10', 'Age 11-15', 'Age 16-20', 'Age 20+', '9th Grade', '12th Grade', 'HS_Dropout', 'HS Grad', 'College 2 Yr', 'Bach Degree', 'Adv Degree', 'College Enroll 18-24', 'College Enroll 25+', 'Median Income FT', 'Median Income PT', 'Income_0_25k', 'Income_25k_48k', 'Income_48k_77k', 'Income_77k_125k', 'Income_125k+', 'Management', 'Science & Eng.', 'Legal Social Service', 'Education & Arts', 'Health care', 'Food prep serve', 'Cleaning & maint.', 'Other services', 'Sales', 'Administrative', 'Farming & fishing', 'Construction', 'Manufacturing', 'Transportation', 'Military', 'Unemployed']
+labels =['Age 0-5', 'Age 6-10', 'Age 11-15', 'Age 16-20', 'Age 20+', '9th Grade', '12th Grade', 'HS_Dropout', 'HS Grad', 'College 2 Yr', 'Bach Degree', 'Adv Degree', 'College Enroll 18-24', 'College Enroll 25+', 'Median Income FT', 'Median Income PT', 'Income 0-25k', 'Income 25k-48k', 'Income 48k-77k', 'Income 77k-125k', 'Income 125k+', 'Management', 'Science & Eng.', 'Legal Social Service', 'Education & Arts', 'Health care', 'Food prep serve', 'Cleaning & maint.', 'Other services', 'Sales', 'Administrative', 'Farming & fishing', 'Construction', 'Manufacturing', 'Transportation', 'Military', 'Unemployed']
 
 #################################################
 # Flask Setup
@@ -51,13 +51,11 @@ def welcome():
 @app.route("/api/v1.0/migration_data/<demography>")
 def migration_data(demography):
 
-    # csvpath = os.path.join('.', 'csv', 'labels.csv')
-
-    # labels = pd.read_csv(csvpath)
-
     session = Session(engine)
+
     stmt = session.query(regional).statement
     df = pd.read_sql_query(stmt, session.bind)
+
     session.close
 
     meta_dict = {'demography':demography}
@@ -65,23 +63,25 @@ def migration_data(demography):
     if demography == 'age':
     
         demography_df = df.iloc[:,1:7].T
-        meta_dict['labels'] =  labels[0:6]
+        meta_dict['labels'] =  labels[0:5]
     
     elif demography == 'education':
         demography_df = df.iloc[:,np.r_[1, 7:16]].T
-        meta_dict['labels'] =  labels[6:15]
+        meta_dict['labels'] =  labels[5:14]
         
     elif demography == 'median_income':
         demography_df = df.iloc[:,np.r_[1, 16:18]].T
-        meta_dict['labels'] =  labels[15:17]
+        meta_dict['labels'] =  labels[14:16]
 
     elif demography == 'income':
         demography_df = df.iloc[:,np.r_[1, 18:23]].T
-        meta_dict['labels'] =  labels[17:22]
+        meta_dict['labels'] =  labels[16:21]
         
     elif demography == 'occupation':
-        demography_df = df.iloc[:,np.r_[1, 23:]].T
-        meta_dict['labels'] =  labels[22:]       
+        demography_df = df.iloc[:,np.r_[1, 23:39]].T
+        meta_dict['labels'] =  labels[21:]
+    else:
+        return jsonify('data not found')     
     
 
     traces = {demography_df[i].to_list()[0] : demography_df[i].to_list()[1:] for i in demography_df}
