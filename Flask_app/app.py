@@ -14,7 +14,7 @@ from flask import Flask, jsonify
 #################################################
 # Database Setup
 #################################################
-rds_connection_string = "immigration_cnn:@localhost:5432/migration_db"
+rds_connection_string = "immigration_cnn:1234@localhost:5432/migration_db"
 engine = create_engine(f'postgresql://{rds_connection_string}')
 
 # reflect an existing database into a new model
@@ -156,58 +156,58 @@ def immigrants_by_county(countries, years):
 def immigrants_by_state(countries, years):
 
 
-country_list = countries.split('&')
+    country_list = countries.split('&')
 
-if ":" in years:
-    
-    year_range = years.split(':')
-    year_range = [int(year) for year in year_range]
-    year_list = list(range(year_range[0],year_range[1]))
-    
-elif years == 'all':
-    
-    a=1
-    
-else:
-    
-    year_list = years.split('&')
-    year_list = [int(year) for year in year_list]
-
-
-population_count = func.sum(details.admissions).label('Count')
-
-if countries == 'all':
-    
-    country_filter = details.birth_country.isnot(None)
-else:
-    country_filter = details.birth_country.in_(country_list)
-
-if years == 'all':
-    
-    year_filter = details.year.isnot(None)
-    
-else:
-    
-    year_filter = details.year.in_(year_list)
+    if ":" in years:
+        
+        year_range = years.split(':')
+        year_range = [int(year) for year in year_range]
+        year_list = list(range(year_range[0],year_range[1]))
+        
+    elif years == 'all':
+        
+        a=1
+        
+    else:
+        
+        year_list = years.split('&')
+        year_list = [int(year) for year in year_list]
 
 
-session = Session(engine)
+    population_count = func.sum(details.admissions).label('Count')
 
-Dataset = session.query(details.residence, states.latitude, states.longitude, population_count)\
-.filter(country_filter)\
-.filter(year_filter)\
-.group_by(details.residence, states.latitude, states.longitude)\
-.filter(details.residence == states.name)\
-.all()
+    if countries == 'all':
+        
+        country_filter = details.birth_country.isnot(None)
+    else:
+        country_filter = details.birth_country.in_(country_list)
 
-session.close
+    if years == 'all':
+        
+        year_filter = details.year.isnot(None)
+        
+    else:
+        
+        year_filter = details.year.in_(year_list)
 
-output_json = {
-    
-    'subject': ', '.join(country_list),
-    'labels':['Count'],
-    'locations': [[*row] for row in Dataset]
-}
+
+    session = Session(engine)
+
+    Dataset = session.query(details.residence, states.latitude, states.longitude, population_count)\
+    .filter(country_filter)\
+    .filter(year_filter)\
+    .group_by(details.residence, states.latitude, states.longitude)\
+    .filter(details.residence == states.name)\
+    .all()
+
+    session.close
+
+    output_json = {
+        
+        'subject': ', '.join(country_list),
+        'labels':['Count'],
+        'locations': [[*row] for row in Dataset]
+    }
 
 
 
