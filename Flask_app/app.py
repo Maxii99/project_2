@@ -271,7 +271,7 @@ def immigrants_by_state(countries, years, top):
     population_count = func.sum(details.admissions).label('Count')
 
     if top == 'all':
-        sortby = details.residence_county
+        sortby = details.residence
         top = 9000000
     else:
         sortby = population_count.desc()
