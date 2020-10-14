@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func, distinct, and_
 
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 
 #################################################
@@ -37,6 +38,7 @@ labels =['Age 0-5', 'Age 6-10', 'Age 11-15', 'Age 16-20', 'Age 20+', '9th Grade'
 # Flask Setup
 #################################################
 app = Flask(__name__)
+cors = CORS(app)
 
 
 #################################################
