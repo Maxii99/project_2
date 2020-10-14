@@ -6,7 +6,7 @@ import pandas as pd
 import sqlalchemy
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
-from sqlalchemy import create_engine, func
+from sqlalchemy import create_engine, func, distinct, and_
 
 from flask import Flask, jsonify
 
@@ -16,6 +16,8 @@ from flask import Flask, jsonify
 #################################################
 rds_connection_string = "immigration_cnn:@localhost:5432/migration_db"
 engine = create_engine(f'postgresql://{rds_connection_string}')
+
+# engine = create_engine("sqlite:///Database/migration_pgdb.sqlite")
 
 # reflect an existing database into a new model
 Base = automap_base()
@@ -41,16 +43,148 @@ app = Flask(__name__)
 # Flask Routes
 #################################################
 
+def Generate_lists(countries, years):
+
+    if ":" in years:
+    
+        year_range = years.split(':')
+        year_range = [int(year) for year in year_range]
+        year_list = list(range(year_range[0],year_range[1]))
+    
+    elif years == 'all':
+    
+        a=1
+    
+    else:
+    
+        year_list = years.split('&')
+        year_list = [int(year) for year in year_list]
+
+
+    if countries == 'all':
+    
+        country_filter = details.birth_country.isnot(None)
+        country_list = ['all']
+
+    elif 'region' in countries:
+
+        region = countries.split(":")[1]
+        country_list = ObtainCountries(region)
+        country_filter = details.birth_country.in_(country_list)
+
+
+
+    else:
+        country_list = countries.split('&')
+        country_filter = details.birth_country.in_(country_list)
+
+    if years == 'all':
+    
+        year_filter = details.year.isnot(None)
+    
+    else:
+    
+        year_filter = details.year.in_(year_list)
+
+    return [country_filter, year_filter, country_list]
+
+def ObtainCountries(region):
+
+    session = Session(engine)
+
+    Dataset = session.query(regions.country)\
+    .filter(regions.region == region).all()
+    
+    session.close
+    
+    return [row.country for row in Dataset]
+
+  
+
+
+
 @app.route("/")
 def welcome():
     """List all available api routes."""
     return (
         f"Available Routes:<br/>"
+        f"/api/v1.0/years<br>"
+        f"/api/v1.0/countries<br>"
+        f"/api/v1.0/regions<br>"
+        f"/api/v1.0/admission_classes<br>"
         f"/api/v1.0/migration_data/(demography)[age\education\median_income\income\occupation]<br/>"
-        f"/api/v1.0/immigrants_by_county/(countries)/(years)<br/>"
-        f"countries Ex.1 China, Ex.2 China&Japan, Ex.3 all<br/>"
+        f"/api/v1.0/immigrants_by_county/(countries or regions)/(years)/(top)<br/>"
+        f"/api/v1.0/immigrants_by_state/(countries or regions)/<years>/(top)<br/>"
+        f"Whereas: <br/>"
+        f"countries Ex.1 China, Ex.2 China&Japan, Ex.4 region:Europe Ex.5 all<br/>"
         f"years Ex.1 2012, Ex.2 2012&2014, Ex.3 all<br/>"
     )
+
+@app.route("/api/v1.0/countries")
+def GetCountries():
+
+    session = Session(engine)
+
+    country = distinct(details.birth_country)
+    Dataset = session.query(country).all()
+
+    session.close
+
+    myJson = [row[0] for row in Dataset]
+
+    myJson.sort()
+
+    return jsonify(myJson)
+
+@app.route("/api/v1.0/years")
+def GetYears():
+
+    session = Session(engine)
+
+    country = distinct(details.year)
+    Dataset = session.query(country).all()
+
+    session.close
+
+    myJson = [row[0] for row in Dataset]
+
+    myJson.sort()
+
+    return jsonify(myJson)
+
+@app.route("/api/v1.0/regions")
+def GetRegions():
+
+    session = Session(engine)
+
+    country = distinct(regions.region)
+    Dataset = session.query(country).all()
+
+    session.close
+
+    myJson = [row[0] for row in Dataset]
+
+    myJson.sort()
+
+    return jsonify(myJson)
+
+@app.route("/api/v1.0/admission_classes")
+def admission_classes():
+
+    session = Session(engine)
+
+    country = distinct(details.admission_class)
+    Dataset = session.query(country).all()
+
+    session.close
+
+    myJson = [row[0] for row in Dataset]
+
+    myJson.sort()
+
+    return jsonify(myJson)
+
+
 
 
 @app.route("/api/v1.0/migration_data/<demography>")
@@ -94,120 +228,75 @@ def migration_data(demography):
     myJSON = [meta_dict, traces]
     return jsonify(myJSON)
 
-@app.route("/api/v1.0/immigrants_by_county/<countries>/<years>")
-def immigrants_by_county(countries, years):
+@app.route("/api/v1.0/immigrants_by_county/<countries>/<years>/<top>")
+def immigrants_by_county(countries, years = 'all', top = 'all'):
 
-
-    country_list = countries.split('&')
-
-    if ":" in years:
-    
-        year_range = years.split(':')
-        year_range = [int(year) for year in year_range]
-        year_list = list(range(year_range[0],year_range[1]))
-    
-    elif years == 'all':
-    
-        a=1
-    
-    else:
-    
-        year_list = years.split('&')
-        year_list = [int(year) for year in year_list]
-
+    country_filter, year_filter, country_list =  Generate_lists(countries, years)
 
     population_count = func.sum(details.admissions).label('Count')
 
-    if countries == 'all':
-    
-        country_filter = details.birth_country.isnot(None)
+    if top == 'all':
+        sortby = details.residence_county
+        top = 9000000
     else:
-        country_filter = details.birth_country.in_(country_list)
-
-    if years == 'all':
-    
-        year_filter = details.year.isnot(None)
-    
-    else:
-    
-        year_filter = details.year.in_(year_list)
-
+        sortby = population_count.desc()
 
     session = Session(engine)
 
-    Dataset = session.query(details.residence_county, counties.latitude, counties.longitude, population_count)\
+    Dataset = session.query(details.residence, details.residence_county, counties.latitude, counties.longitude, population_count)\
     .filter(country_filter)\
     .filter(year_filter)\
-    .group_by(details.residence_county, counties.latitude, counties.longitude)\
-    .filter(details.residence_county == counties.county)\
+    .join(counties, and_(details.residence_county == counties.county, details.residence == counties.state))\
+    .group_by(details.residence, details.residence_county, counties.latitude, counties.longitude)\
+    .order_by(sortby)\
+    .limit(int(top))\
     .all()
 
     session.close
 
-    return  {
-    
+    json =  {
+
         'subject': ', '.join(country_list),
         'labels':['Count'],
         'locations': [[*row] for row in Dataset]
     }
 
+    return jsonify(json)
 
-@app.route("/api/v1.0/immigrants_by_state/<countries>/<years>/")
-def immigrants_by_state(countries, years):
+@app.route("/api/v1.0/immigrants_by_state/<countries>/<years>/<top>")
+def immigrants_by_state(countries, years, top):
 
+    country_filter, year_filter, country_list =  Generate_lists(countries, years)
 
-country_list = countries.split('&')
+    population_count = func.sum(details.admissions).label('Count')
 
-if ":" in years:
-    
-    year_range = years.split(':')
-    year_range = [int(year) for year in year_range]
-    year_list = list(range(year_range[0],year_range[1]))
-    
-elif years == 'all':
-    
-    a=1
-    
-else:
-    
-    year_list = years.split('&')
-    year_list = [int(year) for year in year_list]
+    if top == 'all':
+        sortby = details.residence_county
+        top = 9000000
+    else:
+        sortby = population_count.desc()
 
+    session = Session(engine)
 
-population_count = func.sum(details.admissions).label('Count')
+    Dataset = session.query(details.residence, states.latitude, states.longitude, population_count)\
+    .filter(country_filter)\
+    .filter(year_filter)\
+    .group_by(details.residence, states.latitude, states.longitude)\
+    .filter(details.residence == states.name)\
+    .order_by(sortby)\
+    .limit(int(top))\
+    .all()
 
-if countries == 'all':
-    
-    country_filter = details.birth_country.isnot(None)
-else:
-    country_filter = details.birth_country.in_(country_list)
+    session.close
 
-if years == 'all':
-    
-    year_filter = details.year.isnot(None)
-    
-else:
-    
-    year_filter = details.year.in_(year_list)
-
-
-session = Session(engine)
-
-Dataset = session.query(details.residence, states.latitude, states.longitude, population_count)\
-.filter(country_filter)\
-.filter(year_filter)\
-.group_by(details.residence, states.latitude, states.longitude)\
-.filter(details.residence == states.name)\
-.all()
-
-session.close
-
-output_json = {
+    json = {
     
     'subject': ', '.join(country_list),
     'labels':['Count'],
     'locations': [[*row] for row in Dataset]
-}
+    }
+
+    return jsonify(json)
 
 
 
