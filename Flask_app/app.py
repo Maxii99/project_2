@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import create_engine, func, distinct, and_
 
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 
 #################################################
@@ -37,6 +38,7 @@ labels =['Age 0-5', 'Age 6-10', 'Age 11-15', 'Age 16-20', 'Age 20+', '9th Grade'
 # Flask Setup
 #################################################
 app = Flask(__name__)
+cors = CORS(app)
 
 
 #################################################
@@ -88,6 +90,53 @@ def Generate_lists(countries, years):
 
     return [country_filter, year_filter, country_list]
 
+
+def Generate_State_lists(countries, years):
+
+    if ":" in years:
+    
+        year_range = years.split(':')
+        year_range = [int(year) for year in year_range]
+        year_list = list(range(year_range[0],year_range[1]))
+    
+    elif years == 'all':
+    
+        a=1
+    
+    else:
+    
+        year_list = years.split('&')
+        year_list = [int(year) for year in year_list]
+
+
+    if countries == 'all':
+    
+        country_filter = details.residence.isnot(None)
+        country_list = ['all']
+
+#     elif 'region' in countries:
+
+#         region = countries.split(":")[1]
+#         country_list = ObtainCountries(region)
+#         country_filter = details.birth_country.in_(country_list)
+
+    else:
+        country_list = countries.split('&')
+        country_filter = details.residence.in_(country_list)
+
+    if years == 'all':
+    
+        year_filter = details.year.isnot(None)
+    
+    else:
+    
+        year_filter = details.year.in_(year_list)
+    
+    return [country_filter, year_filter, country_list]
+
+
+
+
 def ObtainCountries(region):
 
     session = Session(engine)
@@ -114,7 +163,8 @@ def welcome():
         f"/api/v1.0/admission_classes<br>"
         f"/api/v1.0/migration_data/(demography)[age\education\median_income\income\occupation]<br/>"
         f"/api/v1.0/immigrants_by_county/(countries or regions)/(years)/(top)<br/>"
-        f"/api/v1.0/immigrants_by_state/(countries or regions)/<years>/(top)<br/>"
+        f"/api/v1.0/immigrants_by_state/(countries or regions)/(years)/(top)<br/>"
+        f"/api/v1.0/diversity_by_state/(locations)/(years)/(top)<br/>"
         f"Whereas: <br/>"
         f"countries Ex.1 China, Ex.2 China&Japan, Ex.4 region:Europe Ex.5 all<br/>"
         f"years Ex.1 2012, Ex.2 2012&2014, Ex.3 all<br/>"
@@ -271,7 +321,7 @@ def immigrants_by_state(countries, years, top):
     population_count = func.sum(details.admissions).label('Count')
 
     if top == 'all':
-        sortby = details.residence_county
+        sortby = details.residence
         top = 9000000
     else:
         sortby = population_count.desc()
@@ -298,7 +348,36 @@ def immigrants_by_state(countries, years, top):
 
     return jsonify(json)
 
+@app.route("/api/v1.0/diversity_by_state/<locations>/<years>/<top>")
+def diversity_by_state(locations, years, top):
 
+    country_filter, year_filter, country_list =  Generate_State_lists(locations, years)
+
+    population_count = func.sum(details.admissions).label('Count')
+
+    if top == 'all':
+        top = 9000000
+
+    session = Session(engine)
+
+    Dataset = session.query(details.birth_country, population_count)\
+    .filter(country_filter)\
+    .filter(year_filter)\
+    .group_by(details.birth_country)\
+    .order_by(population_count.desc())\
+    .limit(int(top))\
+    .all()
+
+    session.close
+
+    json = {
+
+    'subject': ', '.join(country_list),
+    'labels':[row.birth_country for row in Dataset],
+    'locations': [row[1] for row in Dataset]
+    }
+
+    return jsonify(json)
 
 
 
