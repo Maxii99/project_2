@@ -14,7 +14,7 @@ from flask import Flask, jsonify
 #################################################
 # Database Setup
 #################################################
-rds_connection_string = "immigration_cnn:1234@localhost:5432/migration_db"
+rds_connection_string = "immigration_cnn:@localhost:5432/migration_db"
 engine = create_engine(f'postgresql://{rds_connection_string}')
 
 # engine = create_engine("sqlite:///Database/migration_pgdb.sqlite")
@@ -268,43 +268,7 @@ def immigrants_by_state(countries, years, top):
 
     country_filter, year_filter, country_list =  Generate_lists(countries, years)
 
-<<<<<<< HEAD
-    country_list = countries.split('&')
-
-    if ":" in years:
-        
-        year_range = years.split(':')
-        year_range = [int(year) for year in year_range]
-        year_list = list(range(year_range[0],year_range[1]))
-        
-    elif years == 'all':
-        
-        a=1
-        
-    else:
-        
-        year_list = years.split('&')
-        year_list = [int(year) for year in year_list]
-
-
     population_count = func.sum(details.admissions).label('Count')
-
-    if countries == 'all':
-        
-        country_filter = details.birth_country.isnot(None)
-    else:
-        country_filter = details.birth_country.in_(country_list)
-
-    if years == 'all':
-        
-        year_filter = details.year.isnot(None)
-        
-    else:
-        
-        year_filter = details.year.in_(year_list)
-=======
-    population_count = func.sum(details.admissions).label('Count')
->>>>>>> 958aed7e84017f1d4ab86392a7a6e02015b24026
 
     if top == 'all':
         sortby = details.residence_county
@@ -319,23 +283,12 @@ def immigrants_by_state(countries, years, top):
     .filter(year_filter)\
     .group_by(details.residence, states.latitude, states.longitude)\
     .filter(details.residence == states.name)\
-<<<<<<< HEAD
-=======
     .order_by(sortby)\
     .limit(int(top))\
->>>>>>> 958aed7e84017f1d4ab86392a7a6e02015b24026
     .all()
 
     session.close
 
-<<<<<<< HEAD
-    output_json = {
-        
-        'subject': ', '.join(country_list),
-        'labels':['Count'],
-        'locations': [[*row] for row in Dataset]
-    }
-=======
     json = {
     
     'subject': ', '.join(country_list),
@@ -344,7 +297,6 @@ def immigrants_by_state(countries, years, top):
     }
 
     return jsonify(json)
->>>>>>> 958aed7e84017f1d4ab86392a7a6e02015b24026
 
 
 
