@@ -14,10 +14,68 @@
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.3/dist/MarkerCluster.Default.css">
 
     <!-- Our CSS -->
-    <link rel="stylesheet" type="text/css" href="static/css/styles.css">
+    <link rel="stylesheet" type="text/css" href="static/css/styles_map.css">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
 
   </head>
   <body>
+
+    <nav>
+      <ul class = "large_nav">
+          <li style="float:left"> <a  class="alti-logo" href="#"> Immigrants Stat </a></li>
+      
+          <li class="interact">
+
+            <label for="Region">Region</label>
+            <select name="region" class="drop-down" id="region">
+
+            </select>
+
+            <label for="Country">Country</label>
+            <select name="country" class="drop-down" id="country">
+
+            </select>
+
+            <label for="Year">Year</label>
+            <select name="year" class="drop-down" id="year">
+
+            </select>
+
+            <label for="Top">Top</label>
+            <Input name="top" class="drop-down" id="top" value="All">
+
+            <label for="By">By</label>
+            <select name="by" class="drop-down" id="by">
+              <option value="State">State</option>
+              <option value="State">County</option>
+
+            </select>
+
+          </li>
+
+          <div class="mini dropdown">
+
+              <a href="#" class="dropbtn"><i class="fa fa-bars"></i>
+                  </a>
+
+              <div class="dropdown-content">
+                  <a href="maxtemp.html">s. Max Temperature</a>
+                  <a href="humidity.html">vs. Humidity</a>
+                  <a href="cloudiness.html">vs. Cloudiness</a>
+                  <a href="windspeed.html">vs. Wind Speed</a>
+                  <a href="data.html">Data</a> 
+                  <a href="comparison.html">Comparison</a>
+              </div>
+          </div>
+
+      </ul>   
+
+  </nav>
+
+    <!-- <div id="locations" class="input_field" value="all"></div>
+    <div id="dates" class="input_field" value="all"></div>
+    <div id="top" class="input_field" value="all"></div> -->
+
 
     <div id="map"></div>
 
@@ -26,11 +84,9 @@
     integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
     crossorigin=""></script>
     <!-- d3 JS -->
-    <!-- <script src="https://d3js.org/d3.v4.min.js"></script> -->
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.7/d3.min.js"></script>
 
-    <!-- Marker Cluster JS -->
-    <script type="text/javascript" src="https://unpkg.com/leaflet.markercluster@1.0.3/dist/leaflet.markercluster.js"></script>
 
     <!-- Our JS -->
     <script type="text/javascript" src="static/js/config.js"></script>
