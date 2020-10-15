@@ -247,36 +247,46 @@ def migration_data(demography):
 
     session.close
 
-    meta_dict = {'demography':demography}
+    meta_dict = {
+                'demography':demography,
+                'labels':df.iloc[:,1].to_list()
+                }
+
 
     if demography == 'age':
-    
-        demography_df = df.iloc[:,1:7].T
-        meta_dict['labels'] =  labels[0:5]
-    
+        n = 2
+        demography_df = df.iloc[:, n:7]
+
     elif demography == 'education':
-        demography_df = df.iloc[:,np.r_[1, 7:16]].T
-        meta_dict['labels'] =  labels[5:14]
+        
+        n = 7
+        demography_df = df.iloc[:, n:16]
         
     elif demography == 'median_income':
-        demography_df = df.iloc[:,np.r_[1, 16:18]].T
-        meta_dict['labels'] =  labels[14:16]
+        
+        n=16
+        demography_df = df.iloc[:, n:18]
 
     elif demography == 'income':
-        demography_df = df.iloc[:,np.r_[1, 18:23]].T
-        meta_dict['labels'] =  labels[16:21]
         
-    elif demography == 'occupation':
-        demography_df = df.iloc[:,np.r_[1, 23:39]].T
-        meta_dict['labels'] =  labels[21:]
-    else:
-        return jsonify('data not found')     
-    
+        n=18
+        demography_df = df.iloc[:, n:23]
 
-    traces = {demography_df[i].to_list()[0] : demography_df[i].to_list()[1:] for i in demography_df}
+    elif demography == 'occupation':
+        
+        n=23
+        demography_df = df.iloc[:, n:39]
+
+    else:
+        return jsonify('data not found')
+
+    traces = {column : demography_df[column].to_list() for column in demography_df.columns}
 
     myJSON = [meta_dict, traces]
+
     return jsonify(myJSON)
+
+    
 
 @app.route("/api/v1.0/immigrants_by_county/<countries>/<years>/<top>")
 def immigrants_by_county(countries, years = 'all', top = 'all'):
@@ -372,11 +382,16 @@ def diversity_by_state(locations, years, top):
 
     session.close
 
+    total = 0
+    for row in Dataset:
+        total += row[1] 
+
     json = {
 
     'subject': ', '.join(country_list),
     'labels':[row.birth_country for row in Dataset],
-    'locations': [row[1] for row in Dataset]
+    'counts': [row[1] for row in Dataset],
+    'total': total
     }
 
     return jsonify(json)
