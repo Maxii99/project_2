@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Marker Clusters</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css"
+    integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+    crossorigin=""/>
+
+    <!-- Marker Cluster CSS -->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.3/dist/MarkerCluster.Default.css">
+
+    <!-- Our CSS -->
+    <link rel="stylesheet" type="text/css" href="static/css/styles_map.css">
+    <link rel="stylesheet" type="text/css" href="static/css/style.css">
+
+  </head>
+  <body>
+
+    <nav>
+      <ul class = "large_nav">
+          <li style="float:left"> <a  class="alti-logo" href="#"> Demographic Profiles of Immigrants </a></li>
+      
+          <li class="interact">
+            <label for="Region">Region</label>
+            <select name="region" class="drop-down" id="region">
+                <option value="region">region</option>
+                <option value="region1">Mexico</option>
+                <option value="region2">East_and_Southeast_Asia</option>
+                <option value="region4">Central_Asia</option>
+                <option value="region5">South_Asia</option>
+                <option value="region6">Oceania</option>
+                <option value="region7">Europe</option>
+                <option value="region8">Canada_and_Other_North_America</option>
+                <option value="region9">Caribbean</option>
+                <option value="region10">Central_America</option>
+                <option value="region11">South_America</option>
+                <option value="region12">Middle_EastNorth_Africa</option>
+                <option value="region13">SubSaharan_Africa</option>
+                <option value="region14">USA</option>
+            </select>
+
+            <label for="demography">Demography</label>
+            <select name="demography" class="drop-down" id="demography">
+                <option value="demography">Demography</option>
+                <option value="Age">Age</option>
+                <option value="education">Education Attainment</option>
+                <option value="median_income">Median Income</option>
+                <option value="occupation">Occupation</option>
+                <option value="income_group">Income Group</option>
+            </select>
+
+
+          </li>
+
+          <div class="mini dropdown">
+
+              <a href="#" class="dropbtn"><i class="fa fa-bars"></i>
+                  </a>
+
+        
+          </div>
+
+      </ul>   
+
+  </nav>
+
+    <!-- <div id="locations" class="input_field" value="all"></div>
+    <div id="dates" class="input_field" value="all"></div>
+    <div id="top" class="input_field" value="all"></div> -->
+
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"
+    integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
+    crossorigin=""></script>
+    <!-- d3 JS -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.7/d3.min.js"></script>
+
+
+    <!-- Our JS -->
+    <script type="text/javascript" src="static/js/config.js"></script>
+    <script type="text/javascript" src="static/js/BubbleMap.js"></script>
+
+  </body>
+</html>
