@@ -17,6 +17,8 @@ L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
 // Assemble API query URL
 var url = "http://127.0.0.1:5000/api/v1.0/immigrants_by_county/Germany/all/all"
 
+console.log(url)
+
 // Grab the data with d3
 d3.json(url, function(response) {
 
@@ -27,14 +29,14 @@ d3.json(url, function(response) {
   for (var i = 0; i < response.length; i++) {
 
     // Set the data location property to a variable
-    var locations = response[i].locations;
+    var locations = response.locations[i];
 
     // Check for location property
     if (locations) {
 
       // Add a new marker to the cluster group and bind a pop-up
       markers.addLayer(L.marker([locations[2], locations[3]])
-        .bindPopup(response[i].descriptor));
+        .bindPopup(locations[1].descriptor));
     }
 
   }
