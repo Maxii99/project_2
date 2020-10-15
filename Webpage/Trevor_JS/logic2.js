@@ -1,38 +1,56 @@
-function buildPlot(diversity = "all") {
+function buildPlot(Location = "all") {
   
-    var url = `http://127.0.0.1:5000/api/v1.0/diversity_by_state/all/all/all`;
+    var url = `http://127.0.0.1:5000/api/v1.0/diversity_by_state/${Location}/all/all`;
   
     d3.json(url).then(function(data) {
       // Grab values from the response json object to build the plots
-      var label = data.labels;
-      var location = data.locations;
-      // Print the names of the columns
-      console.log(data.labels);
-      // Print the data for each day
-      console.log(data.locations);
+      var label = [];
+      var counts = [];
+      var total = data.total;
+      var limit = 0.01*total;
+      var other_count = 0 
+      var other_names = []
 
-  
-var trace1 = {
-    labels: label,
-    values: location,
-    type: 'pie'
-  };
+      i=0
+      data.counts.forEach((count)=>{
+
+        if (count > limit) 
+          {
+            
+            label.push(data.labels[i]);
+            counts.push(count);
+          
+          }
+        else
+          {
+            other_count +=count;
+            other_names.push(data.labels[i]);
+          };
+
+          i+=1
+      });
+
+      label.push(`Other`);
+      counts.push(other_count);
+    
+      var trace1 = {
+          labels: label,
+          values: counts,
+          type: 'pie'
+        };
 
 
-  
-  var data = [trace1];
-  
-  var layout = {
-    title: "Pie Chart",
-  };
+        var data = [trace1];
+        
+        var layout = {
+          title: `${Location} Diversity`,
+        };
 
+        
+        Plotly.newPlot("plot", data, layout);
 
-
-  
-  Plotly.newPlot("plot", data, layout);
-
-    })
+})
 
 }
 
-buildPlot()
+buildPlot('New York')
