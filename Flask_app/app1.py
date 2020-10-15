@@ -15,7 +15,7 @@ from flask_cors import CORS
 #################################################
 # Database Setup
 #################################################
-rds_connection_string = "immigration_cnn:@localhost:5432/migration_db"
+rds_connection_string = "immigration_cnn:1234@localhost:5432/migration_db"
 engine = create_engine(f'postgresql://{rds_connection_string}')
 
 # engine = create_engine("sqlite:///Database/migration_pgdb.sqlite")
