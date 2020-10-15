@@ -15,7 +15,7 @@ from flask_cors import CORS
 #################################################
 # Database Setup
 #################################################
-rds_connection_string = "immigration_cnn:1234@localhost:5432/migration_db"
+rds_connection_string = "immigration_cnn:@localhost:5432/migration_db"
 engine = create_engine(f'postgresql://{rds_connection_string}')
 
 # engine = create_engine("sqlite:///Database/migration_pgdb.sqlite")
@@ -286,7 +286,7 @@ def immigrants_by_county(countries, years = 'all', top = 'all'):
     population_count = func.sum(details.admissions).label('Count')
 
     if top == 'all':
-        sortby = details.residence_county
+        sortby = population_count.desc()
         top = 9000000
     else:
         sortby = population_count.desc()
@@ -308,6 +308,7 @@ def immigrants_by_county(countries, years = 'all', top = 'all'):
 
         'subject': ', '.join(country_list),
         'labels':['Count'],
+        'max': Dataset[0][4],
         'locations': [[*row] for row in Dataset]
     }
 
@@ -321,7 +322,7 @@ def immigrants_by_state(countries, years, top):
     population_count = func.sum(details.admissions).label('Count')
 
     if top == 'all':
-        sortby = details.residence
+        sortby = population_count.desc()
         top = 9000000
     else:
         sortby = population_count.desc()
@@ -343,6 +344,7 @@ def immigrants_by_state(countries, years, top):
     
     'subject': ', '.join(country_list),
     'labels':['Count'],
+    'max': Dataset[0][3],
     'locations': [[*row] for row in Dataset]
     }
 
