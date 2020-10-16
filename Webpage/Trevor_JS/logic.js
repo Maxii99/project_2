@@ -121,15 +121,15 @@ chart= new GeoChart({
         }
     ],
     "navigation": {
-        "initialLat": 37.0902,
-        "initialLng": 95.7129,
+        "initialLat": 40,
+        "initialLng": -95,
         "initialZoom": 4
     },
     "container": "demo",
     "data": [
         {
             "id": "gdp",
-            "url": "https:\/\/zoomcharts.com\/data\/nominal-gdp-world.json",
+            "url": "http://127.0.0.1:5000/api/v1.0/immigrants_by_county/all/all/all",
             "perBoundsData": false
         }
     ],
