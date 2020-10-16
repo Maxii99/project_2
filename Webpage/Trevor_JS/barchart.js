@@ -8,10 +8,11 @@ function buildPlot(diversity = "all", plot) {
       traces = []
       Object.entries(data[1]).forEach((value)=>{
        traces.push({
-         x: labels,
-         y: value[1],
+         x: value[1],
+         y: labels,
          name: value[0],
-         type: "bar"
+         type: "bar",
+         orientation: "h"
        })
       })
   
@@ -31,5 +32,8 @@ function buildPlot(diversity = "all", plot) {
 
 buildPlot("age", "plot1")
 buildPlot("education", "plot2")
+buildPlot("median_income", "plot3")
+buildPlot("income", "plot4")
+buildPlot("occupation", "plot5")
   
 
