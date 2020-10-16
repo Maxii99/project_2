@@ -36,7 +36,7 @@ chart= new GeoChart({
                             node.label = aggr[0].id;
                         } else {
                             node.display = "image";
-                            node.label = "" + aggr.length + " countries";
+                            node.label = "" + aggr.length + "locations";
                         }
                     },
                 "node": {
@@ -129,7 +129,7 @@ chart= new GeoChart({
     "data": [
         {
             "id": "gdp",
-            "url": "http://127.0.0.1:5000/api/v1.0/immigrants_by_county/all/all/all",
+            "url": "http://127.0.0.1:5000/api/v1.0/immigrants_by_state/all/all/all",
             "perBoundsData": false
         }
     ],

@@ -8,11 +8,10 @@ function buildPlot(diversity = "all", plot) {
       traces = []
       Object.entries(data[1]).forEach((value)=>{
        traces.push({
-         x: value[1],
-         y: labels,
+         x: labels,
+         y: value[1],
          name: value[0],
          type: "bar",
-         orientation: "h"
        })
       })
   
