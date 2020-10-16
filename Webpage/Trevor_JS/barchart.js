@@ -9,7 +9,7 @@ function buildPlot(diversity = "all", plot) {
       Object.entries(data[1]).forEach((value)=>{
        traces.push({
          x: labels,
-         y: values[1],
+         y: value[1],
          name: value[0],
          type: "bar",
        })
