@@ -53,4 +53,4 @@ function buildPlot(Location = "all") {
 
 }
 
-buildPlot('all')
+buildPlot('Illinois')
