@@ -4,14 +4,19 @@ function buildPlot(diversity = "all", plot) {
   
     d3.json(url).then(function(data) {
       // Grab values from the response json object to build the plots
-      var labels = data[0]["labels"];
-      var columns =  Object.values(data[1])
-      
 
+      console.log(data)
+
+      var labels = data.labels;
+      var headers = data.headers;
+      var columns = data.values
+    
       var sum = []
 
       var i=0
+      
       columns[0].forEach(column=>sum.push(1))
+
 
       console.log(`Empty ${sum}`)
 
@@ -29,7 +34,9 @@ function buildPlot(diversity = "all", plot) {
 
       })
 
-      console.log(`filled ${sum}`)
+      console.log(sum)
+
+
 
 
       Normalized = columns.map(column=>{
@@ -37,9 +44,9 @@ function buildPlot(diversity = "all", plot) {
         i=0
         return column.map((Item)=>{
 
-          normal = Item/sum[i];
+          console.log(Item)
 
-          
+          normal = Item/sum[i];
 
           i +=1
 
@@ -49,22 +56,28 @@ function buildPlot(diversity = "all", plot) {
 
       })
 
+      Normalized.forEach(column=>{console.log(column)})
+
 
       traces = []
-      Object.entries(data[1]).forEach((value)=>{
+      var j = 0
+      columns.forEach((value)=>{
        traces.push({
-         x: labels,
-         y: Normalized,
-         name: value[0],
+         x: Normalized[j],
+         y: labels,
+         name: headers[j],
          type: "bar",
+         orientation: 'h'
        })
+
+       j+=1
       })
   
   
   var data = traces;
   
   var layout = {
-    title: "'Bar' Chart",
+    title: `${diversity} Chart`,
     barmode: "stack"
   };
   
