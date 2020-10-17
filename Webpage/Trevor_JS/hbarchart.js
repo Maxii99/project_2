@@ -39,8 +39,6 @@ function buildPlot(diversity = "all", plot) {
 
           normal = Item/sum[i];
 
-          
-
           i +=1
 
           return normal
