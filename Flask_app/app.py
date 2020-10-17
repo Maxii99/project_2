@@ -247,12 +247,6 @@ def migration_data(demography):
 
     session.close
 
-    meta_dict = {
-                'demography':demography,
-                'labels':df.iloc[:,1].to_list()
-                }
-
-
     if demography == 'age':
         n = 2
         demography_df = df.iloc[:, n:7]
@@ -260,7 +254,7 @@ def migration_data(demography):
     elif demography == 'education':
         
         n = 7
-        demography_df = df.iloc[:, n:16]
+        demography_df = df.iloc[:, n:14]
         
     elif demography == 'median_income':
         
@@ -280,11 +274,19 @@ def migration_data(demography):
     else:
         return jsonify('data not found')
 
-    traces = {column : demography_df[column].to_list() for column in demography_df.columns}
+    headers = [column for column in demography_df.columns]
+    
 
-    myJSON = [meta_dict, traces]
+    traces = [demography_df[column].to_list() for column in demography_df.columns]
 
-    return jsonify(myJSON)
+    myjson = {
+        'demography':demography,
+        'labels':df.iloc[:,1].to_list(),
+        'headers':headers,
+        'values': traces
+        }
+
+    return jsonify(myjson)
 
     
 
