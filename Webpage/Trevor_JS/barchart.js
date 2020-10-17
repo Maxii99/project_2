@@ -19,7 +19,7 @@ function buildPlot(diversity = "all", plot) {
   var data = traces;
   
   var layout = {
-    title: "'Bar' Chart",
+    title: `${diversity} Chart`,
     barmode: "stack"
   };
   
